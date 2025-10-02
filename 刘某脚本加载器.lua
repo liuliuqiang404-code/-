@@ -1,8 +1,9 @@
 --因为我没用过，好像就是界面在前面，后面的控件都跟着上一个界面
 
 local OrionLib = loadstring(game:HttpGet("https://pastebin.com/raw/VeaMSRZK"))()
-local LBLG = Instance.new("ScreenGui", getParent)
-local LBL = Instance.new("TextLabel", getParent)
+-- 修复后代码
+local LBLG = Instance.new("ScreenGui", game.CoreGui)  -- 明确父对象为CoreGui
+local LBL = Instance.new("TextLabel", LBLG)          -- 文本标签的父对象设为ScreenGui（逻辑更清晰）
 local player = game.Players.LocalPlayer
 
 LBLG.Name = "LBLG"
