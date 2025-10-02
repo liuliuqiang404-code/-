@@ -68,7 +68,9 @@ local Tab = Window:MakeTab({-- T ad相当于一个id
 })
 
 Tab:AddParagraph("作者","刘某")
+
 Tab:AddParagraph("一眼鸡","❤️❤️❤️")
+
 Tab:AddParagraph("温馨提示","墨水游戏脚本请先在其他游戏复制然后自行加载")
 
 Tab:AddButton ({--这个就相当于一个按钮
@@ -293,7 +295,9 @@ Tab:AddButton({
 })
 
 Tab:AddParagraph("v5","多游戏通用")
+
 Tab:AddParagraph("v5","其中包括99夜")
+
 Tab:AddButton ({--这个就相当于一个按钮
 	Name = "复制",
 	Callback = function ()
@@ -305,6 +309,7 @@ Tab:AddButton ({--这个就相当于一个按钮
                 })
 	end
 })
+
 Tab:AddParagraph("有想要的脚本在q群","@我我就会填加进来")
 
 local Tab = Window:MakeTab({
