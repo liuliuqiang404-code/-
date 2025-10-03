@@ -260,20 +260,6 @@ Tab:AddButton({
   end
 })
 
-Tab:AddButton ({
-	Name = "解卡链接1",
-	Callback = function ()
-	setclipboard("https://ads.luarmor.net/get_key?for=Native_Linkvertise-OlHmNGrpKcxc")
-	end
-})
-
-Tab:AddButton ({
-	Name = "复制解卡2",
-	Callback = function ()
-	setclipboard("https://ads.luarmor.net/get_key?for=Native_Lootlabs-hgTHxCASTxVE")
-	end
-})
-
 Tab:AddParagraph("红叶","红叶到这就完了")
 
 Tab:AddButton({
