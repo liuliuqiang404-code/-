@@ -315,13 +315,6 @@ Tab:AddButton({
   end
 })
 
-Tab:AddButton ({
-	Name = "复制卡密",
-	Callback = function ()
-	setclipboard("VelocityXFreeDoorsKey")
-	end
-})
-
 Tab:AddButton({
   Name = "doors汉化2",
   Callback = function()
