@@ -324,15 +324,3 @@ Tab:AddButton({
 
 Tab:AddParagraph("ms","一章二章皆可用")
 
-local Tab = Window:MakeTab({
-	Name = "墨水游戏",
-	Icon = "rbxassetid://4483345998",
-	PremiumOnly = false
-})
-
-
-local Tab = Window:MakeTab({
-	Name = "内脏与黑火药",
-	Icon = "rbxassetid://4483345998",
-	PremiumOnly = false
-})
