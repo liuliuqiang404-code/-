@@ -447,3 +447,20 @@ Tab:AddButton({
   loadstring(game:HttpGet("https://raw.githubusercontent.com/liuliuqiang404-code/-/refs/heads/main/%E6%88%98%E4%BA%89%E5%A4%A7%E4%BA%A8%E6%B1%89%E5%8C%96"))()
   end
 })
+
+local Tab = Window:MakeTab({
+	Name = "黄某汉化(有大78)",
+	Icon = "rbxassetid://4483345998",
+	PremiumOnly = false
+})
+
+local Section = Tab:AddSection({
+	Name = "下面脚本有大78🤑"
+})
+
+Tab:AddButton({
+  Name = "黄某汉化脚本",
+  Callback = function()
+  loadstring(game:HttpGet("\104\116\116\112\115\58\47\47\114\97\119\46\103\105\116\104\117\98\46\99\111\109\47\67\78\72\77\47\67\104\105\110\101\115\101\47\114\101\102\115\47\104\101\97\100\115\47\109\97\105\110\47\233\187\132\230\159\144\232\135\170\229\138\168\230\177\137\229\140\150"))()
+  end
+})
