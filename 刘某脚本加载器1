@@ -464,3 +464,23 @@ Tab:AddButton({
   loadstring(game:HttpGet("\104\116\116\112\115\58\47\47\114\97\119\46\103\105\116\104\117\98\46\99\111\109\47\67\78\72\77\47\67\104\105\110\101\115\101\47\114\101\102\115\47\104\101\97\100\115\47\109\97\105\110\47\233\187\132\230\159\144\232\135\170\229\138\168\230\177\137\229\140\150"))()
   end
 })
+
+local Tab = Window:MakeTab({
+	Name = "偷走脑红",
+	Icon = "rbxassetid://4483345998",
+	PremiumOnly = false
+})
+
+Tab:AddButton({
+  Name = "偷走脑红最强脚本",
+  Callback = function()
+  loadstring(game:HttpGet("https://raw.githubusercontent.com/342423114514/-/refs/heads/main/qq1038849170%20(1).txt"))()
+  end
+})
+
+Tab:AddButton({
+  Name = "私服",
+  Callback = function()
+  loadstring(game:HttpGet("https://raw.githubusercontent.com/yoursvexyyy/VEX-OP/refs/heads/main/free%20server%20finder"))()
+  end
+})
