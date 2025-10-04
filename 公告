@@ -1,0 +1,425 @@
+-- =============================================
+-- 紧凑型公告确认系统
+-- 作者: AI助手
+-- 版本: v1.0
+-- =============================================
+
+local CompactAnnouncement = {}
+CompactAnnouncement.__index = CompactAnnouncement
+
+function CompactAnnouncement:new()
+    local system = setmetatable({}, CompactAnnouncement)
+    system:initialize()
+    return system
+end
+
+function CompactAnnouncement:initialize()
+    self.isConfirmed = false
+    self.announcementData = {
+        title = "公告",
+        content = [[
+本次更新:
+
+• 更新了公告
+• 填加卡密系统
+• 优化了流畅度
+• 新增了脚本
+
+点击"同意"表示您已阅以上内容。
+        ]],
+        version = "v2.0.1"
+    }
+end
+
+-- 创建紧凑公告界面
+function CompactAnnouncement:createCompactUI()
+    -- 主GUI
+    self.screenGui = Instance.new("ScreenGui")
+    self.screenGui.Name = "CompactAnnouncement"
+    self.screenGui.Parent = game:GetService("CoreGui")
+    
+    -- 背景遮罩
+    self.background = Instance.new("Frame")
+    self.background.Size = UDim2.new(1, 0, 1, 0)
+    self.background.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    self.background.BackgroundTransparency = 0.4
+    self.background.BorderSizePixel = 0
+    self.background.Parent = self.screenGui
+    
+    -- 主公告框 - 更小尺寸
+    self.mainFrame = Instance.new("Frame")
+    self.mainFrame.Size = UDim2.new(0, 400, 0, 300)  -- 更小的尺寸
+    self.mainFrame.Position = UDim2.new(0.5, -200, 0.5, -150)
+    self.mainFrame.BackgroundColor3 = Color3.fromRGB(25, 30, 45)
+    self.mainFrame.BorderSizePixel = 0
+    self.mainFrame.Parent = self.screenGui
+    
+    -- 圆角
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 12)
+    corner.Parent = self.mainFrame
+    
+    -- 边框
+    local stroke = Instance.new("UIStroke")
+    stroke.Color = Color3.fromRGB(0, 120, 255)
+    stroke.Thickness = 2
+    stroke.Parent = self.mainFrame
+    
+    -- 标题栏
+    self.titleBar = Instance.new("Frame")
+    self.titleBar.Size = UDim2.new(1, 0, 0, 50)  -- 更矮的标题栏
+    self.titleBar.BackgroundColor3 = Color3.fromRGB(35, 40, 60)
+    self.titleBar.BorderSizePixel = 0
+    self.titleBar.Parent = self.mainFrame
+    
+    local titleCorner = Instance.new("UICorner")
+    titleCorner.CornerRadius = UDim.new(0, 12)
+    titleCorner.Parent = self.titleBar
+    
+    -- 标题文字
+    self.titleLabel = Instance.new("TextLabel")
+    self.titleLabel.Size = UDim2.new(1, -20, 1, 0)
+    self.titleLabel.Position = UDim2.new(0, 10, 0, 0)
+    self.titleLabel.BackgroundTransparency = 1
+    self.titleLabel.Text = self.announcementData.title
+    self.titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    self.titleLabel.TextSize = 20  -- 更小的字体
+    self.titleLabel.Font = Enum.Font.GothamBold
+    self.titleLabel.TextXAlignment = Enum.TextXAlignment.Left
+    self.titleLabel.Parent = self.titleBar
+    
+    -- 关闭图标
+    self.closeButton = Instance.new("TextButton")
+    self.closeButton.Size = UDim2.new(0, 30, 0, 30)
+    self.closeButton.Position = UDim2.new(1, -35, 0.5, -15)
+    self.closeButton.BackgroundColor3 = Color3.fromRGB(80, 80, 100)
+    self.closeButton.Text = "×"
+    self.closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    self.closeButton.TextSize = 18
+    self.closeButton.Font = Enum.Font.GothamBold
+    self.closeButton.Parent = self.titleBar
+    
+    local closeCorner = Instance.new("UICorner")
+    closeCorner.CornerRadius = UDim.new(1, 0)
+    closeCorner.Parent = self.closeButton
+    
+    -- 内容区域
+    self.contentFrame = Instance.new("Frame")
+    self.contentFrame.Size = UDim2.new(1, -20, 0, 160)  -- 更小的内容区域
+    self.contentFrame.Position = UDim2.new(0, 10, 0, 60)
+    self.contentFrame.BackgroundColor3 = Color3.fromRGB(30, 35, 50)
+    self.contentFrame.BorderSizePixel = 0
+    self.contentFrame.Parent = self.mainFrame
+    
+    local contentCorner = Instance.new("UICorner")
+    contentCorner.CornerRadius = UDim.new(0, 8)
+    contentCorner.Parent = self.contentFrame
+    
+    -- 内容文字
+    self.contentLabel = Instance.new("TextLabel")
+    self.contentLabel.Size = UDim2.new(1, -20, 1, -20)
+    self.contentLabel.Position = UDim2.new(0, 10, 0, 10)
+    self.contentLabel.BackgroundTransparency = 1
+    self.contentLabel.Text = self.announcementData.content
+    self.contentLabel.TextColor3 = Color3.fromRGB(220, 220, 255)
+    self.contentLabel.TextSize = 14  -- 更小的字体
+    self.contentLabel.Font = Enum.Font.Gotham
+    self.contentLabel.TextXAlignment = Enum.TextXAlignment.Left
+    self.contentLabel.TextYAlignment = Enum.TextYAlignment.Top
+    self.contentLabel.TextWrapped = true
+    self.contentLabel.Parent = self.contentFrame
+    
+    -- 版本信息
+    self.versionLabel = Instance.new("TextLabel")
+    self.versionLabel.Size = UDim2.new(1, -20, 0, 20)
+    self.versionLabel.Position = UDim2.new(0, 10, 0, 230)
+    self.versionLabel.BackgroundTransparency = 1
+    self.versionLabel.Text = self.announcementData.version
+    self.versionLabel.TextColor3 = Color3.fromRGB(150, 150, 200)
+    self.versionLabel.TextSize = 12
+    self.versionLabel.Font = Enum.Font.Gotham
+    self.versionLabel.TextXAlignment = Enum.TextXAlignment.Left
+    self.versionLabel.Parent = self.mainFrame
+    
+    -- 按钮容器
+    self.buttonContainer = Instance.new("Frame")
+    self.buttonContainer.Size = UDim2.new(1, -20, 0, 40)
+    self.buttonContainer.Position = UDim2.new(0, 10, 1, -50)
+    self.buttonContainer.BackgroundTransparency = 1
+    self.buttonContainer.Parent = self.mainFrame
+    
+    -- 拒绝按钮
+    self.declineButton = Instance.new("TextButton")
+    self.declineButton.Size = UDim2.new(0, 100, 0, 40)
+    self.declineButton.Position = UDim2.new(0, 0, 0, 0)
+    self.declineButton.Text = "我是乐子我不不知道🤓"
+    self.declineButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    self.declineButton.BackgroundColor3 = Color3.fromRGB(150, 50, 50)
+    self.declineButton.TextSize = 14
+    self.declineButton.Font = Enum.Font.GothamBold
+    self.declineButton.Parent = self.buttonContainer
+    
+    local declineCorner = Instance.new("UICorner")
+    declineCorner.CornerRadius = UDim.new(0, 8)
+    declineCorner.Parent = self.declineButton
+    
+    -- 同意按钮
+    self.agreeButton = Instance.new("TextButton")
+    self.agreeButton.Size = UDim2.new(0, 100, 0, 40)
+    self.agreeButton.Position = UDim2.new(1, -100, 0, 0)
+    self.agreeButton.Text = "我是聪明入我已阅"
+    self.agreeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    self.agreeButton.BackgroundColor3 = Color3.fromRGB(50, 150, 50)
+    self.agreeButton.TextSize = 14
+    self.agreeButton.Font = Enum.Font.GothamBold
+    self.agreeButton.Parent = self.buttonContainer
+    
+    local agreeCorner = Instance.new("UICorner")
+    agreeCorner.CornerRadius = UDim.new(0, 8)
+    agreeCorner.Parent = self.agreeButton
+    
+    -- 设置按钮效果
+    self:setupButtonEffects()
+    
+    -- 绑定事件
+    self:setupEvents()
+end
+
+-- 设置按钮悬停效果
+function CompactAnnouncement:setupButtonEffects()
+    -- 关闭按钮效果
+    self.closeButton.MouseEnter:Connect(function()
+        self.closeButton.BackgroundColor3 = Color3.fromRGB(120, 80, 80)
+    end)
+    
+    self.closeButton.MouseLeave:Connect(function()
+        self.closeButton.BackgroundColor3 = Color3.fromRGB(80, 80, 100)
+    end)
+    
+    -- 拒绝按钮效果
+    self.declineButton.MouseEnter:Connect(function()
+        self.declineButton.BackgroundColor3 = Color3.fromRGB(180, 60, 60)
+    end)
+    
+    self.declineButton.MouseLeave:Connect(function()
+        self.declineButton.BackgroundColor3 = Color3.fromRGB(150, 50, 50)
+    end)
+    
+    -- 同意按钮效果
+    self.agreeButton.MouseEnter:Connect(function()
+        self.agreeButton.BackgroundColor3 = Color3.fromRGB(60, 180, 60)
+    end)
+    
+    self.agreeButton.MouseLeave:Connect(function()
+        self.agreeButton.BackgroundColor3 = Color3.fromRGB(50, 150, 50)
+    end)
+end
+
+-- 设置事件绑定
+function CompactAnnouncement:setupEvents()
+    -- 关闭按钮
+    self.closeButton.MouseButton1Click:Connect(function()
+        self:onDecline()
+    end)
+    
+    -- 拒绝按钮
+    self.declineButton.MouseButton1Click:Connect(function()
+        self:onDecline()
+    end)
+    
+    -- 同意按钮
+    self.agreeButton.MouseButton1Click:Connect(function()
+        self:onAgree()
+    end)
+end
+
+-- 拒绝操作
+function CompactAnnouncement:onDecline()
+    -- 显示简短提示
+    self.titleLabel.Text = "❌ 已取消"
+    self.contentLabel.Text = "您需要同意使用条款才能继续使用本工具。"
+    self.agreeButton.Visible = false
+    self.declineButton.Visible = false
+    self.closeButton.Visible = false
+    
+    -- 2秒后关闭
+    wait(2)
+    self:destroy()
+end
+
+-- 同意操作
+function CompactAnnouncement:onAgree()
+    self.isConfirmed = true
+    
+    -- 更新界面状态
+    self.titleLabel.Text = "✅ 已同意"
+    self.agreeButton.Text = "加载中..."
+    self.agreeButton.BackgroundColor3 = Color3.fromRGB(0, 100, 200)
+    self.agreeButton.Active = false
+    self.declineButton.Active = false
+    self.closeButton.Active = false
+    
+    -- 显示加载状态
+    self.contentLabel.Text = "正在初始化系统..."
+    
+    -- 1秒后执行回调
+    wait(1)
+    
+    if self.confirmCallback then
+        self.confirmCallback()
+    end
+    
+    self:destroy()
+end
+
+-- 显示公告
+function CompactAnnouncement:show(callback)
+    self.confirmCallback = callback
+    self:createCompactUI()
+    
+    -- 返回一个Promise风格的接口
+    return {
+        waitForConfirm = function()
+            while not self.isConfirmed do
+                wait(0.1)
+            end
+            return true
+        end
+    }
+end
+
+-- 快速显示方法
+function CompactAnnouncement:quickShow(callback)
+    self.confirmCallback = callback
+    self:createCompactUI()
+end
+
+-- 销毁界面
+function CompactAnnouncement:destroy()
+    if self.screenGui then
+        self.screenGui:Destroy()
+        self.screenGui = nil
+    end
+end
+
+-- =============================================
+-- 超迷你版本（最小尺寸）
+-- =============================================
+
+local MiniAnnouncement = {}
+MiniAnnouncement.__index = MiniAnnouncement
+
+function MiniAnnouncement:new()
+    local system = setmetatable({}, MiniAnnouncement)
+    return system
+end
+
+function MiniAnnouncement:show(callback)
+    -- 创建最小化UI
+    local screenGui = Instance.new("ScreenGui")
+    screenGui.Parent = game:GetService("CoreGui")
+    
+    -- 主框架
+    local mainFrame = Instance.new("Frame")
+    mainFrame.Size = UDim2.new(0, 300, 0, 200)  -- 最小尺寸
+    mainFrame.Position = UDim2.new(0.5, -150, 0.5, -100)
+    mainFrame.BackgroundColor3 = Color3.fromRGB(30, 35, 50)
+    mainFrame.BorderSizePixel = 0
+    mainFrame.Parent = screenGui
+    
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 8)
+    corner.Parent = mainFrame
+    
+    -- 标题
+    local title = Instance.new("TextLabel")
+    title.Size = UDim2.new(1, 0, 0, 40)
+    title.BackgroundColor3 = Color3.fromRGB(40, 45, 65)
+    title.Text = "公告"
+    title.TextColor3 = Color3.fromRGB(255, 255, 255)
+    title.TextSize = 16
+    title.Font = Enum.Font.GothamBold
+    title.Parent = mainFrame
+    
+    -- 内容
+    local content = Instance.new("TextLabel")
+    content.Size = UDim2.new(1, -20, 0, 100)
+    content.Position = UDim2.new(0, 10, 0, 50)
+    content.BackgroundTransparency = 1
+    content.Text = "使用此脚本即表示您已阅读公告。\n\n请点击'同意'继续。"
+    content.TextColor3 = Color3.fromRGB(220, 220, 255)
+    content.TextSize = 12
+    content.TextWrapped = true
+    content.Parent = mainFrame
+    
+    -- 按钮容器
+    local buttonContainer = Instance.new("Frame")
+    buttonContainer.Size = UDim2.new(1, -20, 0, 35)
+    buttonContainer.Position = UDim2.new(0, 10, 1, -45)
+    buttonContainer.BackgroundTransparency = 1
+    buttonContainer.Parent = mainFrame
+    
+    -- 拒绝按钮
+    local declineBtn = Instance.new("TextButton")
+    declineBtn.Size = UDim2.new(0, 80, 0, 35)
+    declineBtn.Text = "我是乐子我看不懂公告"
+    declineBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    declineBtn.BackgroundColor3 = Color3.fromRGB(150, 50, 50)
+    declineBtn.TextSize = 12
+    declineBtn.Font = Enum.Font.GothamBold
+    declineBtn.Parent = buttonContainer
+    
+    local declineCorner = Instance.new("UICorner")
+    declineCorner.CornerRadius = UDim.new(0, 6)
+    declineCorner.Parent = declineBtn
+    
+    -- 同意按钮
+    local agreeBtn = Instance.new("TextButton")
+    agreeBtn.Size = UDim2.new(0, 80, 0, 35)
+    agreeBtn.Position = UDim2.new(1, -80, 0, 0)
+    agreeBtn.Text = "我是聪明入我已阅读"
+    agreeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    agreeBtn.BackgroundColor3 = Color3.fromRGB(50, 150, 50)
+    agreeBtn.TextSize = 12
+    agreeBtn.Font = Enum.Font.GothamBold
+    agreeBtn.Parent = buttonContainer
+    
+    local agreeCorner = Instance.new("UICorner")
+    agreeCorner.CornerRadius = UDim.new(0, 6)
+    agreeCorner.Parent = agreeBtn
+    
+    -- 按钮事件
+    declineBtn.MouseButton1Click:Connect(function()
+        screenGui:Destroy()
+    end)
+    
+    agreeBtn.MouseButton1Click:Connect(function()
+        screenGui:Destroy()
+        if callback then
+            callback()
+        end
+    end)
+end
+
+-- =============================================
+-- 使用示例
+-- =============================================
+
+-- 方法1：使用紧凑版本（推荐）
+local announcement = CompactAnnouncement:new()
+announcement:quickShow(function()
+    print("用户已同意，执行主脚本...")
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/liuliuqiang404-code/-/refs/heads/main/刘某动画版"))()
+end)
+
+-- 方法2：使用超迷你版本
+-- local mini = MiniAnnouncement:new()
+-- mini:show(function()
+--     print("用户已同意，执行主脚本...")
+--     -- 在这里执行您的主脚本
+-- end)
+
+return {
+    Compact = CompactAnnouncement,
+    Mini = MiniAnnouncement
+}
