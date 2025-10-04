@@ -152,7 +152,7 @@ function CompactAnnouncement:createCompactUI()
     self.declineButton = Instance.new("TextButton")
     self.declineButton.Size = UDim2.new(0, 100, 0, 40)
     self.declineButton.Position = UDim2.new(0, 0, 0, 0)
-    self.declineButton.Text = "我是乐子我不不知道🤓"
+    self.declineButton.Text = "我是乐子我不知道🤓"
     self.declineButton.TextColor3 = Color3.fromRGB(255, 255, 255)
     self.declineButton.BackgroundColor3 = Color3.fromRGB(150, 50, 50)
     self.declineButton.TextSize = 14
