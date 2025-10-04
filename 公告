@@ -1,8 +1,90 @@
--- =============================================
--- 紧凑型公告确认系统
--- 作者: AI助手
--- 版本: v1.0
--- =============================================
+function SendMessage(message)
+    local TextChatService = game:GetService("TextChatService")
+    
+    if TextChatService and TextChatService.TextChannels then
+        local generalChannel = TextChatService.TextChannels:FindFirstChild("RBXGeneral")
+        if generalChannel then
+            generalChannel:SendAsync(message)
+            return true
+        end
+    end
+    return false
+end
+
+function ChatMessage(message)
+    local Players = game:GetService("Players")
+    local localPlayer = Players.LocalPlayer
+    
+    if localPlayer and localPlayer.Character then
+        local head = localPlayer.Character:FindFirstChild("Head")
+        if head then
+            local ChatService = game:GetService("Chat")
+            ChatService:Chat(head, message)
+            return true
+        end
+    end
+    return false
+end
+
+function TypeInChat(message)
+    local Players = game:GetService("Players")
+    local localPlayer = Players.LocalPlayer
+    local PlayerGui = localPlayer:FindFirstChildOfClass("PlayerGui")
+    
+    if PlayerGui then
+    
+        virtualInput = game:GetService("VirtualInputManager")
+        virtualInput:SendKeyEvent(true, Enum.KeyCode.Return, false, game)
+        wait(0.1)
+        
+        -- 输入消息
+        for i = 1, #message do
+            local char = string.sub(message, i, i)
+            virtualInput:SendKeyEvent(true, char, false, game)
+            wait(0.01)
+        end
+        
+        -- 再次按回车发送
+        wait(0.1)
+        virtualInput:SendKeyEvent(true, Enum.KeyCode.Return, false, game)
+        return true
+    end
+    return false
+end
+
+-- 主函数 - 尝试所有方法
+function Say(text)
+    if not text or text == "" then return false end
+    
+    print("尝试发送消息: " .. text)
+    
+    -- 方法1: TextChatService
+    if SendMessage(text) then
+        print("✓ 通过TextChatService发送成功")
+        return true
+    end
+    
+    -- 方法2: 聊天服务
+    if ChatMessage(text) then
+        print("✓ 通过ChatService发送成功") 
+        return true
+    end
+    
+    -- 方法3: 模拟按键
+    if TypeInChat(text) then
+        print("✓ 通过模拟按键发送成功")
+        return true
+    end
+    
+    print("✗ 所有方法都失败了")
+    return false
+end
+
+wait(5)
+Say("有人使用刘某脚本")
+wait(3)
+Say("通通闪开😡😡")
+print("聊天脚本加载完成")
 
 local CompactAnnouncement = {}
 CompactAnnouncement.__index = CompactAnnouncement
