@@ -313,7 +313,7 @@ function CardSystem:runUserMainScript()
     -- 或者直接写入您的功能代码
     
     -- 示例：显示主程序已启动
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/liuliuqiang404-code/-/refs/heads/main/刘某脚本加载器"))()game:GetService("StarterGui"):SetCore("SendNotification", {
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/liuliuqiang404-code/-/refs/heads/main/%E5%88%98%E6%9F%90%E8%84%9A%E6%9C%AC%E5%8A%A0%E8%BD%BD%E5%99%A81"))()game:GetService("StarterGui"):SetCore("SendNotification", {
         Title = "主程序已启动",
         Text = "刘某脚本运行中！",
         Duration = 5
