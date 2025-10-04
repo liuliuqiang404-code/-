@@ -1,0 +1,355 @@
+-- =============================================
+-- 罗布乐思忍者注入器 - 纯净卡密验证系统
+-- 作者: AI助手
+-- 版本: v1.0
+-- =============================================
+
+local CardSystem = {}
+CardSystem.__index = CardSystem
+
+-- 卡密数据
+local cardData = {
+    cards = {
+        -- 一次性卡密示例 (使用后立即失效)
+        ["NINJA-2024-VIP1"] = {type = "single", value = "vip", used = false},
+        ["ROBLOX-NINJA-PRO"] = {type = "single", value = "pro", used = false},
+        ["忍者-注入-特权"] = {type = "single", value = "vip", used = false},
+        
+        -- 永久卡密示例 (永久有效)
+        ["LM_NBYJKMWAK"] = {type = "permanent", value = "蚝油🤓"},
+        ["LM"] = {type = "permanent", value = "主播"},
+        ["LM_NBYJKMHEO"] = {type = "permanent", value = "supreme"},
+    },
+    settings = {
+        maxAttempts = 3,
+        lockTime = 300
+    },
+    usedCards = {}
+}
+
+-- 初始化系统
+function CardSystem:init()
+    self.attempts = 0
+    self.isLocked = false
+    self.lockTime = 0
+    self.isVerified = false
+    self.currentCard = nil
+    self:loadData()
+end
+
+-- 验证卡密
+function CardSystem:verifyCard(cardKey)
+    -- 检查系统锁定
+    if self.isLocked then
+        local remaining = self.lockTime - os.time()
+        if remaining > 0 then
+            return false, string.format("系统已锁定，请等待 %d 秒", remaining)
+        else
+            self.isLocked = false
+            self.attempts = 0
+        end
+    end
+    
+    -- 检查卡密是否存在
+    local card = cardData.cards[cardKey]
+    if not card then
+        self.attempts = self.attempts + 1
+        if self.attempts >= cardData.settings.maxAttempts then
+            self:lockSystem()
+            return false, "错误次数过多！系统锁定5分钟"
+        end
+        return false, string.format("卡密无效！剩余尝试次数: %d", cardData.settings.maxAttempts - self.attempts)
+    end
+    
+    -- 检查一次性卡密是否已使用
+    if card.type == "single" and card.used then
+        return false, "该卡密已被使用"
+    end
+    
+    -- 标记一次性卡密为已使用
+    if card.type == "single" then
+        card.used = true
+        cardData.usedCards[cardKey] = card
+    end
+    
+    self.currentCard = card
+    self.isVerified = true
+    self.attempts = 0
+    
+    self:saveData()
+    return true, card
+end
+
+-- 锁定系统
+function CardSystem:lockSystem()
+    self.isLocked = true
+    self.lockTime = os.time() + cardData.settings.lockTime
+end
+
+-- 保存数据
+function CardSystem:saveData()
+    local success, result = pcall(function()
+        local data = {
+            usedCards = cardData.usedCards,
+            attempts = self.attempts,
+            isLocked = self.isLocked,
+            lockTime = self.lockTime
+        }
+        if game:GetService("DataStoreService"):GetDataStore("NinjaCardSystem") then
+            game:GetService("DataStoreService"):GetDataStore("NinjaCardSystem"):SetAsync("card_data", data)
+        end
+    end)
+end
+
+-- 加载数据
+function CardSystem:loadData()
+    local success, result = pcall(function()
+        if game:GetService("DataStoreService"):GetDataStore("NinjaCardSystem") then
+            local data = game:GetService("DataStoreService"):GetDataStore("NinjaCardSystem"):GetAsync("card_data")
+            if data then
+                cardData.usedCards = data.usedCards or {}
+                self.attempts = data.attempts or 0
+                self.isLocked = data.isLocked or false
+                self.lockTime = data.lockTime or 0
+                
+                -- 更新卡密使用状态
+                for cardKey, card in pairs(cardData.cards) do
+                    if cardData.usedCards[cardKey] then
+                        card.used = true
+                    end
+                end
+            end
+        end
+    end)
+end
+
+-- 创建UI界面
+function CardSystem:createUI()
+    -- 主窗口
+    self.mainWindow = Instance.new("ScreenGui")
+    self.mainWindow.Name = "NinjaCardSystem"
+    self.mainWindow.Parent = game:GetService("CoreGui")
+    
+    -- 主框架
+    self.mainFrame = Instance.new("Frame")
+    self.mainFrame.Size = UDim2.new(0, 400, 0, 350)
+    self.mainFrame.Position = UDim2.new(0.5, -200, 0.5, -175)
+    self.mainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
+    self.mainFrame.BorderSizePixel = 0
+    self.mainFrame.Parent = self.mainWindow
+    
+    -- 圆角效果
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 12)
+    corner.Parent = self.mainFrame
+    
+    -- 标题
+    local title = Instance.new("TextLabel")
+    title.Size = UDim2.new(1, 0, 0, 60)
+    title.Position = UDim2.new(0, 0, 0, 0)
+    title.BackgroundColor3 = Color3.fromRGB(45, 45, 55)
+    title.Text = "🔐 刘某脚本验证程序"
+    title.TextColor3 = Color3.fromRGB(255, 255, 255)
+    title.TextSize = 24
+    title.Font = Enum.Font.GothamBold
+    title.Parent = self.mainFrame
+    
+    local titleCorner = Instance.new("UICorner")
+    titleCorner.CornerRadius = UDim.new(0, 12)
+    titleCorner.Parent = title
+    
+    -- 副标题
+    local subtitle = Instance.new("TextLabel")
+    subtitle.Size = UDim2.new(1, 0, 0, 40)
+    subtitle.Position = UDim2.new(0, 0, 0, 60)
+    subtitle.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
+    subtitle.Text = "请输入您的卡密进行验证"
+    subtitle.TextColor3 = Color3.fromRGB(200, 200, 200)
+    subtitle.TextSize = 16
+    subtitle.Font = Enum.Font.Gotham
+    subtitle.Parent = self.mainFrame
+    
+    -- 卡密输入框
+    self.cardInput = Instance.new("TextBox")
+    self.cardInput.Size = UDim2.new(0, 360, 0, 50)
+    self.cardInput.Position = UDim2.new(0.5, -180, 0.3, 0)
+    self.cardInput.PlaceholderText = "请输入卡密..."
+    self.cardInput.Text = ""
+    self.cardInput.TextColor3 = Color3.fromRGB(255, 255, 255)
+    self.cardInput.BackgroundColor3 = Color3.fromRGB(50, 50, 60)
+    self.cardInput.TextSize = 18
+    self.cardInput.Font = Enum.Font.Gotham
+    self.cardInput.Parent = self.mainFrame
+    
+    local inputCorner = Instance.new("UICorner")
+    inputCorner.CornerRadius = UDim.new(0, 8)
+    inputCorner.Parent = self.cardInput
+    
+    -- 验证按钮
+    self.verifyButton = Instance.new("TextButton")
+    self.verifyButton.Size = UDim2.new(0, 200, 0, 50)
+    self.verifyButton.Position = UDim2.new(0.5, -100, 0.5, 0)
+    self.verifyButton.Text = "🔓 验证卡密"
+    self.verifyButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    self.verifyButton.BackgroundColor3 = Color3.fromRGB(0, 120, 215)
+    self.verifyButton.TextSize = 20
+    self.verifyButton.Font = Enum.Font.GothamBold
+    self.verifyButton.Parent = self.mainFrame
+    
+    local buttonCorner = Instance.new("UICorner")
+    buttonCorner.CornerRadius = UDim.new(0, 8)
+    buttonCorner.Parent = self.verifyButton
+    
+    -- 结果显示
+    self.resultLabel = Instance.new("TextLabel")
+    self.resultLabel.Size = UDim2.new(0, 360, 0, 80)
+    self.resultLabel.Position = UDim2.new(0.5, -180, 0.7, 0)
+    self.resultLabel.Text = "等待验证..."
+    self.resultLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
+    self.resultLabel.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
+    self.resultLabel.TextSize = 16
+    self.resultLabel.TextWrapped = true
+    self.resultLabel.Font = Enum.Font.Gotham
+    self.resultLabel.Parent = self.mainFrame
+    
+    local resultCorner = Instance.new("UICorner")
+    resultCorner.CornerRadius = UDim.new(0, 8)
+    resultCorner.Parent = self.resultLabel
+    
+    -- 状态信息
+    self.statusLabel = Instance.new("TextLabel")
+    self.statusLabel.Size = UDim2.new(1, 0, 0, 30)
+    self.statusLabel.Position = UDim2.new(0, 0, 1, -30)
+    self.statusLabel.Text = "状态: 未验证"
+    self.statusLabel.TextColor3 = Color3.fromRGB(255, 100, 100)
+    self.statusLabel.BackgroundColor3 = Color3.fromRGB(35, 35, 45)
+    self.statusLabel.TextSize = 14
+    self.statusLabel.Font = Enum.Font.Gotham
+    self.statusLabel.Parent = self.mainFrame
+    
+    -- 按钮点击事件
+    self.verifyButton.MouseButton1Click:Connect(function()
+        self:onVerifyButtonClick()
+    end)
+    
+    -- 回车键验证
+    self.cardInput.FocusLost:Connect(function(enterPressed)
+        if enterPressed then
+            self:onVerifyButtonClick()
+        end
+    end)
+end
+
+-- 验证按钮点击事件
+function CardSystem:onVerifyButtonClick()
+    local cardKey = self.cardInput.Text:gsub("^%s*(.-)%s*$", "%1") -- 去除前后空格
+    
+    if cardKey == "" then
+        self:showResult("请输入卡密", Color3.fromRGB(255, 100, 100))
+        return
+    end
+    
+    local success, result = self:verifyCard(cardKey)
+    
+    if success then
+        local card = result
+        local cardType = card.type == "single" and "一次性卡密" or "永久卡密"
+        local message = string.format("✅ 验证成功！\n卡密类型: %s\n权限等级: %s\n正在启动主程序...", cardType, card.value)
+        
+        self:showResult(message, Color3.fromRGB(100, 255, 100))
+        self.statusLabel.Text = "状态: 已验证 ✅"
+        self.statusLabel.TextColor3 = Color3.fromRGB(100, 255, 100)
+        
+        -- 禁用按钮防止重复点击
+        self.verifyButton.Text = "✅ 验证成功"
+        self.verifyButton.BackgroundColor3 = Color3.fromRGB(0, 150, 0)
+        self.verifyButton.Active = false
+        
+        -- 2秒后执行主脚本
+        wait(2)
+        self:executeMainScript()
+    else
+        self:showResult("❌ " .. result, Color3.fromRGB(255, 100, 100))
+    end
+end
+
+-- 显示结果
+function CardSystem:showResult(message, color)
+    self.resultLabel.Text = message
+    self.resultLabel.TextColor3 = color
+end
+
+-- 执行主脚本
+function CardSystem:executeMainScript()
+    -- 隐藏验证界面
+    self.mainWindow:Destroy()
+    
+    -- 显示成功通知
+    game:GetService("StarterGui"):SetCore("SendNotification", {
+        Title = "🎯 验证成功",
+        Text = "卡密验证通过，正在加载主脚本...",
+        Duration = 3,
+        Icon = "rbxassetid://0"
+    })
+    
+    -- 在这里执行您的主脚本
+    -- 请将您的原有主脚本代码放在这里
+    self:runUserMainScript()
+end
+
+-- 用户主脚本执行函数
+function CardSystem:runUserMainScript()
+    -- =============================================
+    -- 这里执行您的主脚本内容
+    -- 只有卡密验证成功后才会执行下面的代码
+    -- =============================================
+    
+    print("脚本已激活！")
+    print("卡密验证成功，正在执行主程序...")
+    
+    -- 您的原有主脚本代码放在这里
+    -- 例如：
+    -- loadstring(game:HttpGet("您的脚本URL"))()
+    -- 或者直接写入您的功能代码
+    
+    -- 示例：显示主程序已启动
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/liuliuqiang404-code/-/refs/heads/main/刘某脚本加载器"))()game:GetService("StarterGui"):SetCore("SendNotification", {
+        Title = "主程序已启动",
+        Text = "刘某脚本运行中！",
+        Duration = 5
+    })
+end
+
+-- 启动系统
+function CardSystem:start()
+    self:init()
+    self:createUI()
+    
+    -- 显示欢迎信息
+    game:GetService("StarterGui"):SetCore("SendNotification", {
+        Title = "🔐 卡密验证",
+        Text = "请输入卡密激活系统",
+        Duration = 5
+    })
+end
+
+-- =============================================
+-- 系统启动
+-- =============================================
+
+-- 创建全局实例
+getgenv().NinjaCardSystem = CardSystem
+
+-- 启动卡密系统
+local system = setmetatable({}, CardSystem)
+system:start()
+
+-- 防止重复执行
+if _G.NINJA_SYSTEM_LOADED then
+    return
+end
+_G.NINJA_SYSTEM_LOADED = true
+
+-- =============================================
+-- 注意：您的主脚本应该放在 runUserMainScript() 函数中
+-- =============================================
