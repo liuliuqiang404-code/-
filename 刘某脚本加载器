@@ -18,7 +18,7 @@ local cardData = {
         -- 永久卡密示例 (永久有效)
         ["LM_NBYJKMWAK"] = {type = "permanent", value = "蚝油🤓"},
         ["LM"] = {type = "permanent", value = "主播"},
-        ["LM_NBYJKMHEO"] = {type = "permanent", value = "supreme"},
+        ["LM_NBYJKMHEO"] = {type = "permanent", value = "合伙人"},
     },
     settings = {
         maxAttempts = 3,
