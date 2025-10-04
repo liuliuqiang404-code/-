@@ -484,3 +484,10 @@ Tab:AddButton({
   loadstring(game:HttpGet("https://raw.githubusercontent.com/yoursvexyyy/VEX-OP/refs/heads/main/free%20server%20finder"))()
   end
 })
+
+Tab:AddButton({
+  Name = "刘某汉化",
+  Callback = function()
+  loadstring(game:HttpGet("https://raw.githubusercontent.com/liuliuqiang404-code/l/refs/heads/main/%E5%81%B7%E8%B5%B0%E8%84%91%E7%BA%A2"))()
+  end
+})
