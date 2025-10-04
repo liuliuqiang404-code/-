@@ -106,10 +106,12 @@ function CompactAnnouncement:initialize()
 • 填加卡密系统
 • 优化了流畅度
 • 新增了脚本
+• 新增偷走脑红脚本
+• 新增大78脚本
 
 点击"同意"表示您已阅以上内容。
         ]],
-        version = "v2.0.1"
+        version = "v3"
     }
 end
 
