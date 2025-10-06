@@ -518,3 +518,23 @@ Tab:AddButton({
   loadstring(game:HttpGet("https://raw.githubusercontent.com/liuliuqiang404-code/-/refs/heads/main/%E9%98%B2%E5%9D%A0%E8%90%BD"))()
   end
 })
+
+local Tab = Window:MakeTab({
+	Name = "被打压咋办看这",
+	Icon = "rbxassetid://4483345998",
+	PremiumOnly = false
+})
+
+Tab:AddButton({
+  Name = "踢所有人",
+  Callback = function()
+  loadstring(game:HttpGet("https://raw.githubusercontent.com/liuliuqiang404-code/-/refs/heads/main/%E8%B8%A2%E4%BA%BA"))()
+  end
+})
+
+Tab:AddButton({
+  Name = "机甲变身",
+  Callback = function()
+  loadstring(game:HttpGet("https://raw.githubusercontent.com/liuliuqiang404-code/-/refs/heads/main/%E8%87%AA%E6%9D%80"))()
+  end
+})
