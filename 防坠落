@@ -1,0 +1,256 @@
+local AntiFallUI = {}
+AntiFallUI.__index = AntiFallUI
+
+function AntiFallUI:new()
+    local system = setmetatable({}, AntiFallUI)
+    system:initialize()
+    return system
+end
+
+function AntiFallUI:initialize()
+    self.enabled = true
+    self.isMinimized = false
+    self.damageReduction = 1.0  -- 100%减伤
+    
+    self:setupProtection()
+    self:createUI()
+end
+
+-- 设置保护系统
+function AntiFallUI:setupProtection()
+    local Players = game:GetService("Players")
+    local localPlayer = Players.LocalPlayer
+    
+    local function setupCharacter(character)
+        local humanoid = character:WaitForChild("Humanoid")
+        
+        -- 100%免疫所有伤害
+        humanoid.HealthChanged:Connect(function()
+            if self.enabled and humanoid.Health < humanoid.MaxHealth then
+                humanoid.Health = humanoid.MaxHealth
+            end
+        end)
+        
+        -- 免疫坠落状态
+        if self.enabled then
+            humanoid:SetStateEnabled(Enum.HumanoidStateType.FallingDown, false)
+            humanoid:SetStateEnabled(Enum.HumanoidStateType.Freefall, false)
+        end
+    end
+    
+    localPlayer.CharacterAdded:Connect(setupCharacter)
+    if localPlayer.Character then
+        setupCharacter(localPlayer.Character)
+    end
+end
+
+-- 创建UI界面
+function AntiFallUI:createUI()
+    -- 主GUI
+    self.screenGui = Instance.new("ScreenGui")
+    self.screenGui.Name = "AntiFallUI"
+    self.screenGui.Parent = game:GetService("CoreGui")
+    
+    -- 最小化按钮（始终显示）
+    self.minimizeBtn = Instance.new("TextButton")
+    self.minimizeBtn.Size = UDim2.new(0, 100, 0, 30)
+    self.minimizeBtn.Position = UDim2.new(0, 10, 0, 10)
+    self.minimizeBtn.Text = "防坠落"
+    self.minimizeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    self.minimizeBtn.BackgroundColor3 = Color3.fromRGB(50, 150, 50)
+    self.minimizeBtn.TextSize = 14
+    self.minimizeBtn.Font = Enum.Font.GothamBold
+    self.minimizeBtn.Parent = self.screenGui
+    
+    local btnCorner = Instance.new("UICorner")
+    btnCorner.CornerRadius = UDim.new(0, 6)
+    btnCorner.Parent = self.minimizeBtn
+    
+    -- 主控制面板（默认隐藏）
+    self.mainFrame = Instance.new("Frame")
+    self.mainFrame.Size = UDim2.new(0, 200, 0, 160)
+    self.mainFrame.Position = UDim2.new(0, 10, 0, 50)
+    self.mainFrame.BackgroundColor3 = Color3.fromRGB(30, 35, 50)
+    self.mainFrame.BorderSizePixel = 0
+    self.mainFrame.Visible = false
+    self.mainFrame.Parent = self.screenGui
+    
+    local frameCorner = Instance.new("UICorner")
+    frameCorner.CornerRadius = UDim.new(0, 8)
+    frameCorner.Parent = self.mainFrame
+    
+    local frameStroke = Instance.new("UIStroke")
+    frameStroke.Color = Color3.fromRGB(0, 150, 255)
+    frameStroke.Thickness = 2
+    frameStroke.Parent = self.mainFrame
+    
+    -- 标题栏
+    local titleBar = Instance.new("Frame")
+    titleBar.Size = UDim2.new(1, 0, 0, 30)
+    titleBar.BackgroundColor3 = Color3.fromRGB(40, 45, 65)
+    titleBar.BorderSizePixel = 0
+    titleBar.Parent = self.mainFrame
+    
+    local titleCorner = Instance.new("UICorner")
+    titleCorner.CornerRadius = UDim.new(0, 8)
+    titleCorner.Parent = titleBar
+    
+    -- 标题文字
+    local titleLabel = Instance.new("TextLabel")
+    titleLabel.Size = UDim2.new(1, -60, 1, 0)
+    titleLabel.Position = UDim2.new(0, 10, 0, 0)
+    titleLabel.BackgroundTransparency = 1
+    titleLabel.Text = "防坠落系统"
+    titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    titleLabel.TextSize = 14
+    titleLabel.Font = Enum.Font.GothamBold
+    titleLabel.TextXAlignment = Enum.TextXAlignment.Left
+    titleLabel.Parent = titleBar
+    
+    -- 最小化按钮（在面板内）
+    self.minimizeToggleBtn = Instance.new("TextButton")
+    self.minimizeToggleBtn.Size = UDim2.new(0, 25, 0, 25)
+    self.minimizeToggleBtn.Position = UDim2.new(1, -30, 0, 2)
+    self.minimizeToggleBtn.Text = "−"
+    self.minimizeToggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    self.minimizeToggleBtn.BackgroundColor3 = Color3.fromRGB(80, 80, 100)
+    self.minimizeToggleBtn.TextSize = 16
+    self.minimizeToggleBtn.Font = Enum.Font.GothamBold
+    self.minimizeToggleBtn.Parent = titleBar
+    
+    local toggleCorner = Instance.new("UICorner")
+    toggleCorner.CornerRadius = UDim.new(1, 0)
+    toggleCorner.Parent = self.minimizeToggleBtn
+    
+    -- 开关按钮
+    self.toggleBtn = Instance.new("TextButton")
+    self.toggleBtn.Size = UDim2.new(1, -20, 0, 35)
+    self.toggleBtn.Position = UDim2.new(0, 10, 0, 40)
+    self.toggleBtn.Text = "已启用 (100%)"
+    self.toggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    self.toggleBtn.BackgroundColor3 = Color3.fromRGB(50, 150, 50)
+    self.toggleBtn.TextSize = 14
+    self.toggleBtn.Font = Enum.Font.GothamBold
+    self.toggleBtn.Parent = self.mainFrame
+    
+    local toggleBtnCorner = Instance.new("UICorner")
+    toggleBtnCorner.CornerRadius = UDim.new(0, 6)
+    toggleBtnCorner.Parent = self.toggleBtn
+    
+    -- 状态显示
+    self.statusLabel = Instance.new("TextLabel")
+    self.statusLabel.Size = UDim2.new(1, -20, 0, 40)
+    self.statusLabel.Position = UDim2.new(0, 10, 0, 85)
+    self.statusLabel.BackgroundTransparency = 1
+    self.statusLabel.Text = "状态: 100%伤害免疫\n坠落伤害完全无效"
+    self.statusLabel.TextColor3 = Color3.fromRGB(100, 255, 100)
+    self.statusLabel.TextSize = 12
+    self.statusLabel.TextWrapped = true
+    self.statusLabel.Font = Enum.Font.Gotham
+    self.statusLabel.Parent = self.mainFrame
+    
+    -- 提示文字
+    local hintLabel = Instance.new("TextLabel")
+    hintLabel.Size = UDim2.new(1, -20, 0, 30)
+    hintLabel.Position = UDim2.new(0, 10, 1, -35)
+    hintLabel.BackgroundTransparency = 1
+    hintLabel.Text = "点击标题栏按钮最小化"
+    hintLabel.TextColor3 = Color3.fromRGB(150, 150, 200)
+    hintLabel.TextSize = 10
+    hintLabel.Font = Enum.Font.Gotham
+    hintLabel.Parent = self.mainFrame
+    
+    -- 绑定事件
+    self:setupEvents()
+end
+
+-- 设置事件
+function AntiFallUI:setupEvents()
+    -- 最小化按钮点击（显示/隐藏主面板）
+    self.minimizeBtn.MouseButton1Click:Connect(function()
+        self:toggleMainPanel()
+    end)
+    
+    -- 面板内最小化按钮
+    self.minimizeToggleBtn.MouseButton1Click:Connect(function()
+        self:minimizePanel()
+    end)
+    
+    -- 开关按钮
+    self.toggleBtn.MouseButton1Click:Connect(function()
+        self:toggleProtection()
+    end)
+end
+
+-- 切换主面板显示/隐藏
+function AntiFallUI:toggleMainPanel()
+    self.mainFrame.Visible = not self.mainFrame.Visible
+    self.isMinimized = not self.mainFrame.Visible
+    
+    if self.mainFrame.Visible then
+        self.minimizeBtn.Text = "打开中..."
+        wait(0.1)
+        self.minimizeBtn.Text = "防坠落"
+    else
+        self.minimizeBtn.Text = "防坠落"
+    end
+end
+
+-- 最小化面板
+function AntiFallUI:minimizePanel()
+    self.mainFrame.Visible = false
+    self.isMinimized = true
+    self.minimizeBtn.Text = "防坠落"
+end
+
+-- 切换保护开关
+function AntiFallUI:toggleProtection()
+    self.enabled = not self.enabled
+    
+    if self.enabled then
+        self.toggleBtn.Text = "已启用 (100%)"
+        self.toggleBtn.BackgroundColor3 = Color3.fromRGB(50, 150, 50)
+        self.statusLabel.Text = "状态: 100%伤害免疫\n坠落伤害完全无效"
+        self.statusLabel.TextColor3 = Color3.fromRGB(100, 255, 100)
+        self.minimizeBtn.BackgroundColor3 = Color3.fromRGB(50, 150, 50)
+        print("100%防坠落已启用")
+    else
+        self.toggleBtn.Text = "已禁用"
+        self.toggleBtn.BackgroundColor3 = Color3.fromRGB(150, 50, 50)
+        self.statusLabel.Text = "状态: 已禁用\n坠落伤害正常"
+        self.statusLabel.TextColor3 = Color3.fromRGB(255, 100, 100)
+        self.minimizeBtn.BackgroundColor3 = Color3.fromRGB(150, 50, 50)
+        print("100%防坠落已禁用")
+    end
+    
+    -- 重新设置角色保护
+    self:setupProtection()
+end
+
+-- 启动系统
+function AntiFallUI:start()
+    print("100%防坠落系统启动")
+    print("伤害免疫: 100%")
+    print("UI: 可最小化/最大化")
+    
+    -- 显示启动通知
+    game:GetService("StarterGui"):SetCore("SendNotification", {
+        Title = "挨打要立正😡😡😡",
+        Text = "100%伤害免疫已启用\n点击按钮控制UI",
+        Duration = 5
+    })
+end
+
+-- =============================================
+-- 系统启动
+-- =============================================
+
+-- 创建并启动系统
+local antiFall = AntiFallUI:new()
+antiFall:start()
+
+-- 防止重复执行
+if _G.ANTI_FALL_UI then return end
+_G.ANTI_FALL_UI = true
+
+return AntiFallUI
