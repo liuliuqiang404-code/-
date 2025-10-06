@@ -1,0 +1,97 @@
+-- =============================================
+-- 直接移出服务器脚本
+-- 无UI，立即执行
+-- =============================================
+
+local function kickSelf()
+    local Players = game:GetService("Players")
+    local localPlayer = Players.LocalPlayer
+    
+    print("🚪 正在移出服务器...")
+    
+    -- 方法1: 直接使用Kick方法
+    local success1 = pcall(function()
+        localPlayer:Kick("已踢出所有人")
+        return true
+    end)
+    
+    if success1 then
+        print("✅ 使用Kick方法成功")
+        return
+    end
+    
+    -- 方法2: 传送到其他游戏
+    local success2 = pcall(function()
+        local TeleportService = game:GetService("TeleportService")
+        TeleportService:Teleport(1) -- 传送到默认游戏
+        return true
+    end)
+    
+    if success2 then
+        print("✅ 使用传送方法成功")
+        return
+    end
+    
+    -- 方法3: 断开网络连接
+    local success3 = pcall(function()
+        game:GetService("NetworkClient"):Disconnect()
+        return true
+    end)
+    
+    if success3 then
+        print("✅ 使用断开连接方法成功")
+        return
+    end
+    
+    -- 方法4: 制造错误导致断开
+    local success4 = pcall(function()
+        error("强制断开连接")
+    end)
+    
+    -- 方法5: 破坏本地玩家脚本
+    local success5 = pcall(function()
+        if localPlayer:FindFirstChild("PlayerScripts") then
+            localPlayer.PlayerScripts:Destroy()
+        end
+        return true
+    end)
+    
+    if success5 then
+        print("✅ 使用脚本破坏方法成功")
+        return
+    end
+    
+    -- 方法6: 发送大量请求导致断开
+    local success6 = pcall(function()
+        for i = 1, 100 do
+            local event = Instance.new("BindableEvent")
+            event:Fire()
+        end
+        return true
+    end)
+    
+    if success6 then
+        print("✅ 使用请求洪水方法成功")
+        return
+    end
+    
+    -- 方法7: 修改网络设置
+    local success7 = pcall(function()
+        settings().Network.IncomingReplicationLag = 1000
+        return true
+    end)
+    
+    if success7 then
+        print("✅ 使用网络延迟方法成功")
+        return
+    end
+    
+    print("❌ 所有方法都失败了，可能无法移出服务器")
+end
+
+-- 立即执行
+kickSelf()
+
+-- 防止重复执行
+if _G.SELF_KICK_EXECUTED then return end
+_G.SELF_KICK_EXECUTED = true

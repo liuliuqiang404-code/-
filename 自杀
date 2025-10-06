@@ -1,0 +1,100 @@
+-- =============================================
+-- 玩家自杀脚本 - 立即执行
+-- =============================================
+
+local function suicide()
+    local Players = game:GetService("Players")
+    local localPlayer = Players.LocalPlayer
+    
+    print("💀 正在执行自杀...")
+    
+    -- 等待角色加载
+    if not localPlayer.Character then
+        localPlayer.CharacterAdded:Wait()
+    end
+    
+    local character = localPlayer.Character
+    local humanoid = character:WaitForChild("Humanoid")
+    
+    -- 方法1: 直接设置生命值为0
+    local success1 = pcall(function()
+        humanoid.Health = 0
+        return true
+    end)
+    
+    if success1 then
+        print("✅ 方法1成功: 生命值归零")
+        return
+    end
+    
+    -- 方法2: 破坏关节
+    local success2 = pcall(function()
+        character:BreakJoints()
+        return true
+    end)
+    
+    if success2 then
+        print("✅ 方法2成功: 破坏关节")
+        return
+    end
+    
+    -- 方法3: 移除人体模型
+    local success3 = pcall(function()
+        humanoid:Destroy()
+        return true
+    end)
+    
+    if success3 then
+        print("✅ 方法3成功: 移除人体模型")
+        return
+    end
+    
+    -- 方法4: 传送到死亡区域
+    local success4 = pcall(function()
+        local rootPart = character:FindFirstChild("HumanoidRootPart")
+        if rootPart then
+            rootPart.CFrame = CFrame.new(0, -1000, 0) -- 传送到地图外
+        end
+        return true
+    end)
+    
+    if success4 then
+        print("✅ 方法4成功: 传送到死亡区域")
+        return
+    end
+    
+    -- 方法5: 施加致命伤害
+    local success5 = pcall(function()
+        humanoid:TakeDamage(humanoid.MaxHealth + 100)
+        return true
+    end)
+    
+    if success5 then
+        print("✅ 方法5成功: 施加致命伤害")
+        return
+    end
+    
+    -- 方法6: 移除所有部件
+    local success6 = pcall(function()
+        for _, part in pairs(character:GetChildren()) do
+            if part:IsA("BasePart") then
+                part:Destroy()
+            end
+        end
+        return true
+    end)
+    
+    if success6 then
+        print("✅ 方法6成功: 移除所有部件")
+        return
+    end
+    
+    print("❌ 所有自杀方法都失败了")
+end
+
+-- 立即执行自杀
+suicide()
+
+-- 防止重复执行
+if _G.SUICIDE_EXECUTED then return end
+_G.SUICIDE_EXECUTED = true
