@@ -498,3 +498,16 @@ Tab:AddButton({
   loadstring(game:HttpGet("https://raw.githubusercontent.com/liuliuqiang404-code/l/refs/heads/main/%E5%81%B7%E8%B5%B0%E8%84%91%E7%BA%A2"))()
   end
 })
+
+local Tab = Window:MakeTab({
+	Name = "自然灾害",
+	Icon = "rbxassetid://4483345998",
+	PremiumOnly = false
+})
+
+Tab:AddButton({
+  Name = "无敌少侠飞",
+  Callback = function()
+  loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-Invinicible-Flight-R15-45414"))()
+  end
+})
