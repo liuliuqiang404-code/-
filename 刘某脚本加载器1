@@ -365,6 +365,13 @@ Tab:AddButton({
   end
 })
 
+Tab:AddButton({
+  Name = "99夜最无敌脚本",
+  Callback = function()
+  loadstring(game:HttpGet("https://raw.githubusercontent.com/liuliuqiang404-code/-/refs/heads/main/99%E5%A4%9C%E6%B1%89%E5%8C%96.txt"))()
+  end
+})
+
 local Tab = Window:MakeTab({
 	Name = "doors",
 	Icon = "rbxassetid://4483345998",
